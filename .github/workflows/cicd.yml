@@ -17,6 +17,8 @@ jobs:
 
       - name: Create Kubernetes Cluster
         uses: helm/kind-action@v1.12.0
+        with:
+          cluster_name: kind 
 
       - name: Load Image into Kubernetes
         run: kind load docker-image devops-lab-app:ci
@@ -32,3 +34,4 @@ jobs:
           kubectl get deployments
           kubectl get pods
           kubectl get services
+
