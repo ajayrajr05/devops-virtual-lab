@@ -1,0 +1,18 @@
+name: DevOps CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Verify application files
+        run: |
+          test -f app/index.html
+          test -f app/Dockerfile
+          echo "Application files verified"
