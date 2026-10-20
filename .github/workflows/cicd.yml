@@ -6,13 +6,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  validate:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Code
         uses: actions/checkout@v4
-      - name: Verify application files
+
+      - name: Build Docker Image
+        run: docker build -t devops-lab-app:ci ./app
+
+      - name: Create Kubernetes Cluster
+        uses: helm/kind-action@v1.12.0
+
+      - name: Load Image into Kubernetes
+        run: kind load docker-image devops-lab-app:ci
+
+      - name: Deploy Application
         run: |
-          test -f app/index.html
-          test -f app/Dockerfile
-          echo "Application files verified"
+          kubectl apply -f k8s/deployment.yml
+          kubectl apply -f k8s/service.yml
+          kubectl rollout status deployment/devops-lab-app --timeout=120s
+
+      - name: Verify Deployment
+        run: |
+          kubectl get deployments
+          kubectl get pods
+          kubectl get services
